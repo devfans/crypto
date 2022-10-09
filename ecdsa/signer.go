@@ -52,8 +52,7 @@ func (s *ECDSASigner) Encrypt(pub, msg, s1, s2 []byte) (data []byte, err error) 
 	p, err := UnmarshalPubkey(pub)
 	if err != nil { return }
 	pubkey := ecies.ImportECDSAPublic(p)
-	ecies.Encrypt(rand.Reader, pubkey, msg, s1, s2)
-	return
+	return ecies.Encrypt(rand.Reader, pubkey, msg, s1, s2)
 }
 
 func (s *ECDSASigner) Decrypt(data, s1, s2 []byte) (msg []byte, err error) {
