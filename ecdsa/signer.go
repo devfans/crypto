@@ -2,6 +2,7 @@ package ecdsa
 
 import (
 	"bytes"
+	"crypto/rand"
 	"errors"
 	"fmt"
 	"os"
@@ -9,6 +10,7 @@ import (
 
 	"github.com/ethereum/go-ethereum/accounts/keystore"
 	"github.com/ethereum/go-ethereum/crypto"
+	"github.com/ethereum/go-ethereum/crypto/ecies"
 	"github.com/google/uuid"
 )
 
@@ -44,6 +46,18 @@ func (s *ECDSASigner) FromKeyFile(file string) (err error) {
 
 func (s *ECDSASigner) SaveKeyFile(file string) (err error) {
 	return SaveKeyFile(file, s.key)
+}
+
+func (s *ECDSASigner) Encrypt(pub, msg, s1, s2 []byte) (data []byte, err error) {
+	p, err := UnmarshalPubkey(pub)
+	if err != nil { return }
+	pubkey := ecies.ImportECDSAPublic(p)
+	ecies.Encrypt(rand.Reader, pubkey, msg, s1, s2)
+	return
+}
+
+func (s *ECDSASigner) Decrypt(data, s1, s2 []byte) (msg []byte, err error) {
+	return ecies.ImportECDSA(s.key).Decrypt(data, s1, s2)
 }
 
 func NewSigner(key *PrivateKey) Signer {

@@ -14,6 +14,9 @@ type Signer interface {
 	SaveKeyFile(file string) (err error)
 	FromKeyStoreFile(file, pass string) (err error)
 	SaveKeyStoreFile(file, pass string) (err error)
+
+	Decrypt(data, s1, s2 []byte) (msg []byte, err error)
+	Encrypt(pub, msg, s1, s2 []byte) (data []byte, err error)
 }
 
 type Verifier interface {
