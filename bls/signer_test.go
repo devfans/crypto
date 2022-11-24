@@ -23,6 +23,7 @@ func TestSigner(t *testing.T) {
 	assert.NoError(t, err, "failed to sign data")
 	t.Logf("ecdsa pri key %x size %d", ec.FromECDSA(key), len(ec.FromECDSA(key)) )
 	t.Logf("ecdsa pub key %x size %d", ec.FromECDSAPub(&key.PublicKey), len(ec.FromECDSAPub(&key.PublicKey)) )
+	t.Logf("ecdsa address %x size %d", ec.PubkeyToAddress(key.PublicKey).Bytes(), len(ec.PubkeyToAddress(key.PublicKey).Bytes()))
 	t.Logf("ecdsa compressed pub key %x size %d", ec.CompressPubkey(&key.PublicKey), len(ec.CompressPubkey(&key.PublicKey)) )
 	t.Logf("ecdsa sig %x, size %d", sig, len(sig))
 
