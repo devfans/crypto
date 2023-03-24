@@ -2,6 +2,8 @@ package ecdsa
 
 import (
 	"crypto/ecdsa"
+	"fmt"
+	"math/big"
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
@@ -51,3 +53,28 @@ func CompressedPubToAddress(pub []byte) (addr Address, err error) {
 	return PubkeyToAddress(*p), nil
 }
 
+func DecodeSignature(sig []byte, chainID *big.Int) (r, s, v *big.Int) {
+	if len(sig) != crypto.SignatureLength {
+		panic(fmt.Sprintf("wrong size for signature: got %d, want %d", len(sig), crypto.SignatureLength))
+	}
+	r = new(big.Int).SetBytes(sig[:32])
+	s = new(big.Int).SetBytes(sig[32:64])
+	v = new(big.Int).SetBytes([]byte{sig[64] + 27})
+	if chainID != nil && chainID.Sign() != 0 {
+		v = big.NewInt(int64(sig[64] + 35))
+			v.Add(v, chainID)
+	}
+	return r, s, v
+}
+
+func ComposeSignature(r, s, v, chainID *big.Int) (sig []byte) {
+	sig = make([]byte, crypto.SignatureLength)
+	r.FillBytes(sig[:32])
+	s.FillBytes(sig[32:64])
+	if chainID == nil || chainID.Sign() == 0 {
+		sig[64] = byte(v.Int64() - 27)
+	} else {
+		sig[64] = byte(new(big.Int).Sub(v, chainID).Int64() - 35)
+	}
+	return
+}

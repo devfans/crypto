@@ -517,6 +517,8 @@ func TestSafeCopy2d32Bytes(t *testing.T) {
 	assert.Equal(t, input, output)
 }
 
+const RootLength = 32
+
 func TestZeroRoot(t *testing.T) {
 	input := make([]byte, RootLength)
 	output := bytesutil.ZeroRoot(input)
